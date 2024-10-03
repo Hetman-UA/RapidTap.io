@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ua">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Точки: Игра на реакцию</title>
+    <title>RapidTap IO</title>
     <style>
         :root {
             --bg-color: #f0f8ff;
@@ -201,30 +201,30 @@
 </head>
 <body>
     <div id="game-container">
-        <h1>Точки: Игра на реакцию</h1>
+        <h1>RapidTap IO</h1>
         <div id="score-container">
-            <div class="score-item">Счет: <span id="score">0</span></div>
-            <div class="score-item">Серия: <span id="streak">0</span></div>
-            <div class="score-item">Время: <span id="timer">0:00</span></div>
-            <div class="score-item">Уровень: <span id="difficulty-level">1</span></div>
+            <div class="score-item">Рахунок: <span id="score">0</span></div>
+            <div class="score-item">Комбо: <span id="streak">0</span></div>
+            <div class="score-item">Час: <span id="timer">0:00</span></div>
+            <div class="score-item">Рівень: <span id="difficulty-level">1</span></div>
         </div>
         <div id="game-area"></div>
         <div id="difficulty-container">
             <button class="difficulty-button active" data-difficulty="easy">Легко</button>
             <button class="difficulty-button" data-difficulty="normal">Нормально</button>
-            <button class="difficulty-button" data-difficulty="hard">Хардкор</button>
+            <button class="difficulty-button" data-difficulty="hard">Неможливо</button>
         </div>
-        <button id="start-button">Начать игру</button>
-        <button id="theme-toggle">Сменить тему</button>
+        <button id="start-button">Почати гру</button>
+        <button id="theme-toggle">Змінити тему</button>
         <div id="leaderboard">
-            <h2>Таблица рекордов</h2>
+            <h2>Таблиця рекордів</h2>
             <table>
                 <thead>
                     <tr>
-                        <th>Место</th>
-                        <th>Счет</th>
-                        <th>Серия</th>
-                        <th>Время</th>
+                        <th>Місце</th>
+                        <th>Рахунок</th>
+                        <th>Комбо</th>
+                        <th>Час</th>
                     </tr>
                 </thead>
                 <tbody id="leaderboard-body">
@@ -313,7 +313,7 @@
                     if (dotsClickedInStreak >= 15) {
                         streak++;
                         dotsClickedInStreak = 0;
-                        showNotification(`Поздравляем! Новая серия #${streak}`);
+                        showNotification(`Нове комбо #${streak}!`);
                     }
                     createDot();
                 }
@@ -352,7 +352,7 @@
 
         function endGame() {
             isGameRunning = false;
-            showNotification(`Игра окончена! Счет: ${score}, Серий: ${streak}, Время: ${timerElement.textContent}`);
+            showNotification(`Гра закінчена! Рахунок: ${score}, Комбо: ${streak}, Час: ${timerElement.textContent}`);
             updateLeaderboard(score, streak, timerElement.textContent);
             score = 0;
             streak = 0;
