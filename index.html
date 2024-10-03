@@ -258,9 +258,9 @@
         let lastDotPosition = { x: 250, y: 250 };
 
         const difficultySettings = {
-            easy: 6000,
-            normal: 4000,
-            hard: 2000
+            easy: 4000,
+            normal: 3000,
+            hard: 1000
         };
 
         function createDot() {
@@ -334,11 +334,11 @@
 
         function updateTimer() {
             gameTime++;
-            let minutes = Math.floor(gameTime / 60);
-            let seconds = gameTime % 60;
+            let minutes = Math.floor(gameTime / 30);
+            let seconds = gameTime % 30;
             timerElement.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
 
-            if (gameTime % 180 === 0) {  // Каждые 3 минуты
+            if (gameTime % 30 === 0) {  // Каждые 3 минуты
                 increaseDifficulty();
             }
         }
