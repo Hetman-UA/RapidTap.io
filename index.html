@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Точки: Игра на реакцию</title>
+    <style>
+        :root {
+            --bg-color: #f0f8ff;
+            --text-color: #333;
+            --primary-color: #4682b4;
+            --secondary-color: #e6f3ff;
+            --accent-color: #ff6347;
+            --shadow-color: rgba(0,0,0,0.1);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        #game-container {
+            text-align: center;
+            background-color: var(--secondary-color);
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px var(--shadow-color);
+            transition: background-color 0.3s, box-shadow 0.3s;
+            max-width: 95%;
+            width: 100%;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            font-size: 2em;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px var(--shadow-color);
+        }
+
+        #game-area {
+            width: 100%;
+            max-width: 500px;
+            height: 500px;
+            border: 3px solid var(--primary-color);
+            position: relative;
+            background-color: var(--bg-color);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: inset 0 0 20px var(--shadow-color);
+            transition: background-color 0.3s, border-color 0.3s, box-shadow 0.3s;
+            margin: 0 auto;
+        }
+
+        .dot {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: var(--accent-color);
+            position: absolute;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .dot:hover {
+            transform: scale(1.2);
+            box-shadow: 0 0 15px var(--accent-color);
+        }
+
+        button {
+            margin-top: 20px;
+            padding: 12px 25px;
+            font-size: 18px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+            box-shadow: 0 5px 15px var(--shadow-color);
+        }
+
+        button:hover {
+            background-color: #36648b;
+            transform: translateY(-2px);
+        }
+
+        #score-container {
+            font-size: 18px;
+            margin: 20px 0;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .score-item {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 25px;
+            box-shadow: 0 5px 15px var(--shadow-color);
+        }
+
+        #score, #streak, #timer, #difficulty-level {
+            font-weight: bold;
+            font-size: 22px;
+        }
+
+        #theme-toggle {
+            background-color: #666;
+        }
+
+        body.dark-theme {
+            --bg-color: #1a1a2e;
+            --text-color: #e0e0e0;
+            --primary-color: #3a86ff;
+            --secondary-color: #16213e;
+            --accent-color: #ff006e;
+            --shadow-color: rgba(255,255,255,0.1);
+        }
+
+        #difficulty-container {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .difficulty-button {
+            padding: 8px 15px;
+            font-size: 16px;
+        }
+
+        .active {
+            background-color: var(--accent-color);
+        }
+
+        #leaderboard {
+            margin-top: 20px;
+            width: 100%;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        #leaderboard table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: var(--secondary-color);
+            box-shadow: 0 5px 15px var(--shadow-color);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        #leaderboard th, #leaderboard td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid var(--primary-color);
+        }
+
+        #leaderboard th {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        #leaderboard tr:last-child td {
+            border-bottom: none;
+        }
+
+        @media (max-width: 600px) {
+            #game-area {
+                height: 300px;
+            }
+
+            h1 {
+                font-size: 1.5em;
+            }
+
+            #score-container {
+                font-size: 14px;
+            }
+
+            #score, #streak, #timer, #difficulty-level {
+                font-size: 18px;
+            }
+
+            button {
+                padding: 8px 15px;
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <h1>Точки: Игра на реакцию</h1>
+        <div id="score-container">
+            <div class="score-item">Счет: <span id="score">0</span></div>
+            <div class="score-item">Серия: <span id="streak">0</span></div>
+            <div class="score-item">Время: <span id="timer">0:00</span></div>
+            <div class="score-item">Уровень: <span id="difficulty-level">1</span></div>
+        </div>
+        <div id="game-area"></div>
+        <div id="difficulty-container">
+            <button class="difficulty-button active" data-difficulty="easy">Легко</button>
+            <button class="difficulty-button" data-difficulty="normal">Нормально</button>
+            <button class="difficulty-button" data-difficulty="hard">Хардкор</button>
+        </div>
+        <button id="start-button">Начать игру</button>
+        <button id="theme-toggle">Сменить тему</button>
+        <div id="leaderboard">
+            <h2>Таблица рекордов</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Место</th>
+                        <th>Счет</th>
+                        <th>Серия</th>
+                        <th>Время</th>
+                    </tr>
+                </thead>
+                <tbody id="leaderboard-body">
+                    <!-- Рекорды будут добавлены сюда динамически -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        const gameArea = document.getElementById('game-area');
+        const scoreElement = document.getElementById('score');
+        const streakElement = document.getElementById('streak');
+        const timerElement = document.getElementById('timer');
+        const difficultyLevelElement = document.getElementById('difficulty-level');
+        const startButton = document.getElementById('start-button');
+        const themeToggle = document.getElementById('theme-toggle');
+        const difficultyButtons = document.querySelectorAll('.difficulty-button');
+        const leaderboardBody = document.getElementById('leaderboard-body');
+
+        let score = 0;
+        let streak = 0;
+        let dotTimeout;
+        let isGameRunning = false;
+        let dotsClickedInStreak = 0;
+        let difficulty = 'easy';
+        let clickTime = 6000;
+        let gameTimer;
+        let gameTime = 0;
+        let difficultyLevel = 1;
+        let lastDotPosition = { x: 250, y: 250 };
+
+        const difficultySettings = {
+            easy: 6000,
+            normal: 4000,
+            hard: 2000
+        };
+
+        function createDot() {
+            const dot = document.createElement('div');
+            dot.className = 'dot';
+            
+            let attempts = 0;
+            let validPosition = false;
+            let x, y;
+
+            while (!validPosition && attempts < 50) {
+                x = Math.random() * (gameArea.clientWidth - 30);
+                y = Math.random() * (gameArea.clientHeight - 30);
+                validPosition = true;
+
+                for (let otherDot of gameArea.getElementsByClassName('dot')) {
+                    let otherX = parseInt(otherDot.style.left);
+                    let otherY = parseInt(otherDot.style.top);
+                    let distance = Math.sqrt(Math.pow(x - otherX, 2) + Math.pow(y - otherY, 2));
+                    
+                    if (distance < 100) {
+                        validPosition = false;
+                        break;
+                    }
+                }
+
+                attempts++;
+            }
+
+            dot.style.left = lastDotPosition.x + 'px';
+            dot.style.top = lastDotPosition.y + 'px';
+            gameArea.appendChild(dot);
+
+            // Анимация перемещения точки
+            setTimeout(() => {
+                dot.style.transition = 'left 0.5s, top 0.5s';
+                dot.style.left = x + 'px';
+                dot.style.top = y + 'px';
+            }, 50);
+
+            lastDotPosition = { x, y };
+
+            dot.addEventListener('click', () => {
+                if (isGameRunning) {
+                    gameArea.removeChild(dot);
+                    score++;
+                    dotsClickedInStreak++;
+                    updateScore();
+                    clearTimeout(dotTimeout);
+                    if (dotsClickedInStreak >= 15) {
+                        streak++;
+                        dotsClickedInStreak = 0;
+                        showNotification(`Поздравляем! Новая серия #${streak}`);
+                    }
+                    createDot();
+                }
+            });
+
+            dotTimeout = setTimeout(() => {
+                if (gameArea.contains(dot)) {
+                    gameArea.removeChild(dot);
+                    endGame();
+                }
+            }, clickTime);
+        }
+
+        function updateScore() {
+            scoreElement.textContent = score;
+            streakElement.textContent = streak;
+        }
+
+        function updateTimer() {
+            gameTime++;
+            let minutes = Math.floor(gameTime / 60);
+            let seconds = gameTime % 60;
+            timerElement.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+
+            if (gameTime % 180 === 0) {  // Каждые 3 минуты
+                increaseDifficulty();
+            }
+        }
+
+        function increaseDifficulty() {
+            difficultyLevel++;
+            difficultyLevelElement.textContent = difficultyLevel;
+            clickTime = Math.max(clickTime - 500, 1000);  // Уменьшаем время на клик, но не менее 1 секунды
+            showNotification(`Уровень сложности повышен до ${difficultyLevel}!`);
+        }
+
+        function endGame() {
+            isGameRunning = false;
+            showNotification(`Игра окончена! Счет: ${score}, Серий: ${streak}, Время: ${timerElement.textContent}`);
+            updateLeaderboard(score, streak, timerElement.textContent);
+            score = 0;
+            streak = 0;
+            dotsClickedInStreak = 0;
+            gameTime = 0;
+            difficultyLevel = 1;
+            updateScore();
+            timerElement.textContent = '0:00';
+            difficultyLevelElement.textContent = '1';
+            gameArea.innerHTML = '';
+            startButton.style.display = 'inline-block';
+            enableDifficultyButtons();
+            clearInterval(gameTimer);
+        }
+
+        function startGame() {
+            isGameRunning = true;
+            score = 0;
+            streak = 0;
+            dotsClickedInStreak = 0;
+            gameTime = 0;
+            difficultyLevel = 1;
+            updateScore();
+            startButton.style.display = 'none';
+            disableDifficultyButtons();
+            createDot();
+            gameTimer = setInterval(updateTimer, 1000);
+        }
+
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.textContent = message;
+            notification.style.position = 'fixed';
+            notification.style.top = '20px';
+            notification.style.left = '50%';
+            notification.style.transform = 'translateX(-50%)';
+            notification.style.backgroundColor = 'var(--primary-color)';
+            notification.style.color = 'white';
+            notification.style.padding = '10px 20px';
+            notification.style.borderRadius = '5px';
+            notification.style.zIndex = '1000';
+            document.body.appendChild(notification);
+            setTimeout(() => {
+                document.body.removeChild(notification);
+            }, 3000);
+        }
+
+        function toggleTheme() {
+            document.body.classList.toggle('dark-theme');
+            themeToggle.textContent = document.body.classList.contains('dark-theme') ? 'Светлая тема' : 'Темная тема';
+        }
+
+        function setDifficulty(newDifficulty) {
+            difficulty = newDifficulty;
+            clickTime = difficultySettings[difficulty];
+            difficultyButtons.forEach(button => {
+                button.classList.toggle('active', button.dataset.difficulty === difficulty);
+            });
+        }
+
+        function disableDifficultyButtons() {
+            difficultyButtons.forEach(button => button.disabled = true);
+        }
+
+        function enableDifficultyButtons() {
+            difficultyButtons.forEach(button => button.disabled = false);
+        }
+
+        function updateLeaderboard(newScore, newStreak, newTime) {
+            let leaderboard = JSON.parse(localStorage.getItem('leaderboard')) || [];
+            leaderboard.push({ score: newScore, streak: newStreak, time: newTime });
+            leaderboard.sort((a, b) => b.score - a.score);
+            leaderboard = leaderboard.slice(0, 5); // Оставляем только топ-5 результатов
+            localStorage.setItem('leaderboard', JSON.stringify(leaderboard));
+            displayLeaderboard();
+        }
+
+        function displayLeaderboard() {
+            let leaderboard = JSON.parse(localStorage.getItem('leaderboard')) || [];
+            leaderboardBody.innerHTML = '';
+            leaderboard.forEach((entry, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${entry.score}</td>
+                    <td>${entry.streak}</td>
+                    <td>${entry.time}</td>
+                `;
+                leaderboardBody.appendChild(row);
+            });
+        }
+
+        // Инициализация игры
+        startButton.addEventListener('click', startGame);
+        themeToggle.addEventListener('click', toggleTheme);
+        difficultyButtons.forEach(button => {
+            button.addEventListener('click', () => setDifficulty(button.dataset.difficulty));
+        });
+        displayLeaderboard(); // Отображаем таблицу рекордов при загрузке страницы
+    </script>
+</body>
+</html>
